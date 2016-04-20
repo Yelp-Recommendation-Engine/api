@@ -4,6 +4,7 @@ from flask.ext.cors import CORS
 import pymongo 
 import json 
 import re
+import datetime
 from pymongo import MongoClient
 from bson import BSON
 from bson import json_util
@@ -25,7 +26,7 @@ def rate_restaurant():
     user_id = rating_data["user_id"]
     business_id = rating_data["business_id"]
 
-    reviews.insert( { "user_id": user_id, "business_id": business_id, "stars": rating})
+    reviews.insert( { "user_id": user_id, "business_id": business_id, "stars": rating, "date": datetime.datetime.now()})
     user_business = user_id + "." + business_id
     user_ratings.update( {"_id": user_id}, { "$set": { user_business: rating}})
     business_user = business_id + "." + user_id
