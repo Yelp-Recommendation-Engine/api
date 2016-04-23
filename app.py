@@ -11,7 +11,10 @@ from bson import json_util
 from recommendations import getRecommendations
 
 connection = MongoClient("mongodb://localhost:27017")
-db = connection.recommender 
+db = connection.recommender
+
+db = connection.users
+
 reviews = db.reviews
 
 app = Flask(__name__)
@@ -58,6 +61,46 @@ def get_restaurants_by_name():
     businesses = coll.find( { "name": {"$regex": re.compile(u''+ data['name'], re.IGNORECASE) }})
     resp = make_response(json.dumps(list(businesses), sort_keys=True, indent=4, default=json_util.default))
     return resp
+
+
+#services for registering users
+@app.route('/authenticateUser', methods=['POST'])
+def authenticate_user():
+    print("Service has been called")
+    coll = db.users
+    data = json.loads(request.data.decode('utf-8'))
+
+    cursor = db.userdetails.find({"name": data['name'], "password": data['password']})
+
+    if cursor.count() > 0:
+        return "true"
+    else:
+        return "false"
+
+@app.route('/registerUser', methods=['POST'])
+def register_user():
+    print("Register user")
+
+    coll = db.users
+    data = json.loads(request.data.decode('utf-8'))
+
+    result = db.userdetails.insert_one(
+        {
+            "name" : data['name'],
+            "password" : data['password'],
+            "email" : data['email'],
+            "address" : data['address'],
+            "city" : data['city']
+        }
+    )
+    print("succesful add")
+    print(result.inserted_id)
+    if result.inserted_id != "":
+        return "success"
+    else:
+        return "failure"
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
