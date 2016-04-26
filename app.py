@@ -13,7 +13,7 @@ from recommendations import getRecommendations
 connection = MongoClient("mongodb://localhost:27017")
 db = connection.recommender
 
-db = connection.users
+dbUser = connection.users
 
 reviews = db.reviews
 
@@ -67,10 +67,10 @@ def get_restaurants_by_name():
 @app.route('/authenticateUser', methods=['POST'])
 def authenticate_user():
     print("Service has been called")
-    coll = db.users
+    coll = dbUser.users
     data = json.loads(request.data.decode('utf-8'))
 
-    cursor = db.userdetails.find({"name": data['name'], "password": data['password']})
+    cursor = dbUser.userdetails.find({"name": data['name'], "password": data['password']})
 
     if cursor.count() > 0:
         return "true"
@@ -81,10 +81,10 @@ def authenticate_user():
 def register_user():
     print("Register user")
 
-    coll = db.users
+    coll = dbUser.users
     data = json.loads(request.data.decode('utf-8'))
 
-    result = db.userdetails.insert_one(
+    result = dbUser.userdetails.insert_one(
         {
             "name" : data['name'],
             "password" : data['password'],
