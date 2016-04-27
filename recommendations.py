@@ -25,6 +25,7 @@ db = connection.recommender
 user_dict={}
 business_dict={}
 itemsim = {}
+B = {}
 
 def prepareDatasets():
     for user in db.user_ratings.find():
@@ -39,6 +40,10 @@ def prepareDatasets():
     	item.pop("_id", None) 
     	itemsim.update(item)
 
+    for business in db.businesses.find():
+        b_id = business["business_id"]
+        B[b_id] = business
+
     #top rated businesses to be recommended when there is no record
     topRestaurants={}
     for i in business_dict:
@@ -51,14 +56,13 @@ def prepareDatasets():
     topRestaurants.reverse()
     topRestaurants = [(5.0,j) for i,j in topRestaurants[:5]]
 
-    #match user and business information
-    B = {}
 
-    with open('B.json', 'r') as f:
-        data = {}
-        for line in f:
-            data = json.loads(line)
-        B = data
+
+    # with open('B.json', 'r') as f:
+    #     data = {}
+    #     for line in f:
+    #         data = json.loads(line)
+    #     B = data
 
 def getRecommendedItems(user):
     prepareDatasets()
@@ -90,7 +94,7 @@ def getRecommendedItems(user):
     rankings.reverse( )
     print(len(rankings))
     if rankings:
-        return  [(i,j) for i,j in rankings[:20]]
+        return  [(i,B[j]) for i,j in rankings[:20]]
     else:
         return  [(i,B[j]) for i,j in topRestaurants]
 
