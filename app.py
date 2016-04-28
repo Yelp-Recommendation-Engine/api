@@ -16,6 +16,7 @@ connection = MongoClient("mongodb://localhost:27017")
 db = connection.recommender 
 reviews = db.reviews
 users = db.users
+user_ratings = db.user_ratings
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -112,16 +113,18 @@ def authenticate_user():
 def register_user():
     print("Register user")
     data = json.loads(request.data.decode('utf-8'))
-
+    user_id = id_generator()
     result = users.insert_one(
         {
-            "user_id": id_generator(),
+            "user_id": user_id,
             "name" : data['name'],
             "password" : data['password'],
             "email" : data['email'],
             "address" : data['address']
         }
     )
+
+    user_ratings.insert( {"_id": user_id, user_id: {}})
     print("succesful add")
     print(result.inserted_id)
     if result.inserted_id != "":
