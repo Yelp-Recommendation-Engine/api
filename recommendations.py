@@ -2,12 +2,8 @@
 import re
 import random
 import numpy as np
-import matplotlib.cm as cm
-import statsmodels.api as sm
-from collections import Counter
 from collections import defaultdict
 from scipy.stats.stats import pearsonr
-import matplotlib.pyplot as plt
 from math import sqrt
 import time
 import json
